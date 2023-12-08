@@ -222,7 +222,7 @@ define :play_flute_melody4 do
 end
 
 define :alternative_melody do
-  live_loop :foo do
+  live_loop :funky1 do
     # Define a chord progression
     chords = [:G3, :D3, :A3, :E3]
     # Play each chord with a funky rhythm
@@ -240,7 +240,7 @@ define :alternative_melody do
     stop if global_timer >= 280
   end
 
-  live_loop :foo1 do
+  live_loop :funky2 do
     use_synth :hoover
 
     # Funky bassline
@@ -311,7 +311,52 @@ define :main do
       alternative_melody
       stop if global_timer >= 280
     end
-    main
+    live_loop :second_run do
+      in_thread do
+        play_beat global_timer
+        stop if global_timer >= 120
+      end
+      sleep 20
+      #add some guitar plucks to the beat
+      in_thread do
+        play_guitar
+        stop if global_timer >= 245
+      end
+      sleep 20
+      #add a soft background melody to make it softer
+      play_melody1
+      sleep 35
+      # let this run for a bit before adding another melody
+      in_thread do
+        play_flute_melody1
+        stop if global_timer >= 120
+      end
+      # stop the previous melody and immediately begin the next one
+      in_thread do
+        play_flute_melody2
+        stop if global_timer >= 175
+      end
+      # stop the previous melody, again, and begin the next on
+      in_thread do
+        play_flute_melody3
+        stop if global_timer >= 210
+      end
+      #let the guiter and melody1 play alone for a bit
+      puts "before 4th"
+      sleep 35
+      #add a 4th simple melody
+      in_thread do
+        play_flute_melody4
+        stop if global_timer >= 245
+      end
+      puts "after 4th"
+      sleep 15
+      in_thread do
+        alternative_melody
+        stop if global_timer >= 280
+      end
+    end
   end
 end
+
 main
